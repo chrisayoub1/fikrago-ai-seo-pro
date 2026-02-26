@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -286,7 +286,7 @@
 </footer>
 
 <script>
-  var history = [];
+  var chatHistory = [];
   var busy = false;
 
   // Auto-grow textarea
@@ -322,10 +322,8 @@
     ta.style.height = 'auto';
     box.scrollTop = box.scrollHeight;
 
-    // Save to history
-    history.push({ role: 'user', content: prompt });
+    chatHistory.push({ role: 'user', content: prompt });
 
-    // Disable input
     busy = true;
     document.getElementById('sendBtn').disabled = true;
 
@@ -333,56 +331,93 @@
     var loader = document.createElement('div');
     loader.className = 'msg msg-ai';
     loader.id = 'loader';
-    loader.innerHTML = '<div class="msg-label">🤖 AI Assistant</div>'
+    loader.innerHTML = '<div class="msg-label">AI Assistant</div>'
       + '<div class="msg-body"><span class="ldots">Loading<span>.</span><span>.</span><span>.</span></span></div>';
     box.appendChild(loader);
     box.scrollTop = box.scrollHeight;
 
-    // ── POST to /api/proxy — no API key here ──────────────────
+    // Detect environment:
+    // - On Vercel (deployed): use /api/proxy  (key stays server-side)
+    // - In local preview (file:// or no proxy): call Z.ai directly
+    var onVercel = window.location.hostname !== 'localhost'
+                && window.location.protocol !== 'file:'
+                && window.location.hostname !== '127.0.0.1';
+
+    if (onVercel) {
+      callProxy(prompt, box);
+    } else {
+      callDirectly(prompt, box);
+    }
+  }
+
+  // ── When deployed on Vercel ─────────────────────────────────
+  function callProxy(prompt, box) {
     fetch('/api/proxy', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt: prompt, messages: history })
+      body: JSON.stringify({ prompt: prompt, messages: chatHistory })
     })
     .then(function (r) {
-      if (!r.ok) throw new Error('Server error ' + r.status + ' — ' + r.statusText);
+      if (!r.ok) throw new Error('Server error ' + r.status + ' ' + r.statusText);
       return r.json();
     })
     .then(function (data) {
       removeLoader();
-
-      // Support { reply }, { choices }, { content } response shapes
-      var reply =
-        (data.reply) ||
-        (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) ||
-        (data.content && data.content[0] && data.content[0].text) ||
-        null;
-
-      if (!reply) {
-        if (data.error) {
-          showError(box, 'API error: ' + (data.error.message || JSON.stringify(data.error)));
-        } else {
-          showError(box, 'Unexpected response:\n' + JSON.stringify(data, null, 2));
-        }
-        history.pop();
-        return;
-      }
-
-      history.push({ role: 'assistant', content: reply });
-      addBubble(box, 'ai', '🤖 AI Assistant', reply);
+      var reply = extractReply(data);
+      if (!reply) { showError(box, 'Bad response: ' + JSON.stringify(data)); chatHistory.pop(); return; }
+      chatHistory.push({ role: 'assistant', content: reply });
+      addBubble(box, 'ai', 'AI Assistant', reply);
     })
     .catch(function (err) {
       removeLoader();
-      history.pop();
-      showError(box,
-        'Could not reach /api/proxy\n\n'
-        + err.message + '\n\n'
-        + 'Check:\n'
-        + '• Vercel app is deployed\n'
-        + '• api/proxy.js exists in your GitHub repo\n'
-        + '• ZAI_API_KEY is set in Vercel Environment Variables'
-      );
+      chatHistory.pop();
+      // fallback to direct if proxy fails
+      callDirectly(prompt, box);
     });
+  }
+
+  // ── Direct Z.ai call (preview / local) ─────────────────────
+  function callDirectly(prompt, box) {
+    var systemMsg = {
+      role: 'system',
+      content: 'You are a helpful AI assistant for Fikrago SEO Pro. Answer every question directly and clearly. Just answer what the user asks.'
+    };
+
+    fetch('https://open.bigmodel.cn/api/paas/v4/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer eed381a0703e49cc883bfcb411a35728.p4GJCOid992nuhh1'
+      },
+      body: JSON.stringify({
+        model: 'glm-4-flash',
+        max_tokens: 1500,
+        messages: [systemMsg].concat(chatHistory)
+      })
+    })
+    .then(function (r) {
+      if (!r.ok) throw new Error('API error ' + r.status + ' ' + r.statusText);
+      return r.json();
+    })
+    .then(function (data) {
+      removeLoader();
+      var reply = extractReply(data);
+      if (!reply) { showError(box, 'No reply from AI: ' + JSON.stringify(data)); chatHistory.pop(); return; }
+      chatHistory.push({ role: 'assistant', content: reply });
+      addBubble(box, 'ai', 'AI Assistant', reply);
+    })
+    .catch(function (err) {
+      removeLoader();
+      chatHistory.pop();
+      showError(box, 'Connection failed: ' + err.message + '\n\nMake sure you are connected to the internet.');
+    });
+  }
+
+  function extractReply(data) {
+    if (data.reply) return data.reply;
+    if (data.choices && data.choices[0] && data.choices[0].message) return data.choices[0].message.content;
+    if (data.content && data.content[0] && data.content[0].text) return data.content[0].text;
+    return null;
   }
 
   function removeLoader() {
@@ -399,7 +434,7 @@
       div.textContent = text;
     } else {
       div.className = 'msg msg-ai';
-      div.innerHTML = '<div class="msg-label">' + esc(label) + '</div>'
+      div.innerHTML = '<div class="msg-label">AI Assistant</div>'
         + '<div class="msg-body">' + fmt(text) + '</div>';
     }
     box.appendChild(div);
@@ -409,7 +444,7 @@
   function showError(box, text) {
     var div = document.createElement('div');
     div.className = 'msg msg-ai msg-error';
-    div.innerHTML = '<div class="msg-label">⚠️ Error</div>'
+    div.innerHTML = '<div class="msg-label">Error</div>'
       + '<div class="msg-body" style="color:#fca5a5">' + esc(text) + '</div>';
     box.appendChild(div);
     box.scrollTop = box.scrollHeight;
