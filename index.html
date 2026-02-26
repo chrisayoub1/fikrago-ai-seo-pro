@@ -1,140 +1,433 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fikrago AI SEO Pro</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #080c14;
-  --bg2: #0d1421;
-  --bg3: #111827;
-  --card: rgba(255,255,255,0.04);
-  --card-border: rgba(255,255,255,0.08);
-  --accent: #00e5ff;
-  --accent2: #7c3aed;
-  --accent3: #10b981;
-  --text: #f1f5f9;
-  --muted: #64748b;
-  --danger: #ef4444;
-  --warn: #f59e0b;
-  --sidebar-w: 240px;
-}
-[data-theme="light"] {
-  --bg: #f0f4ff;
-  --bg2: #e8edf8;
-  --bg3: #dde4f0;
-  --card: rgba(255,255,255,0.7);
-  --card-border: rgba(100,120,200,0.15);
-  --text: #0f172a;
-  --muted: #64748b;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;overflow-x:hidden}
-h1,h2,h3,h4{font-family:'Syne',sans-serif}
+  :root {
+    --bg:     #07090f;
+    --bg2:    #0d1117;
+    --bg3:    #161b27;
+    --border: rgba(255,255,255,0.07);
+    --accent: #00e5ff;
+    --purple: #7c3aed;
+    --green:  #10b981;
+    --red:    #ef4444;
+    --text:   #e2e8f0;
+    --muted:  #64748b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px 60px;
+  }
+  header { text-align: center; margin-bottom: 36px; }
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 30px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 6px;
+  }
+  .tagline { font-size: 13px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 12px;
+    background: rgba(16,185,129,0.1);
+    border: 1px solid rgba(16,185,129,0.2);
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    color: var(--green);
+  }
+  .dot { width: 7px; height: 7px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
-/* Sidebar */
-.sidebar{width:var(--sidebar-w);background:var(--bg2);border-right:1px solid var(--card-border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;transition:transform .3s}
-.sidebar-logo{padding:24px 20px;border-bottom:1px solid var(--card-border)}
-.logo-text{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.logo-sub{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-top:2px}
-.sidebar-nav{flex:1;padding:16px 0;overflow-y:auto}
-.nav-section{padding:8px 20px 4px;font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--muted);font-weight:600}
-.nav-item{display:flex;align-items:center;gap:12px;padding:10px 20px;cursor:pointer;color:var(--muted);font-size:14px;transition:all .2s;border-left:3px solid transparent;margin:1px 0}
-.nav-item:hover,.nav-item.active{color:var(--text);background:var(--card);border-left-color:var(--accent)}
-.nav-item.active{color:var(--accent)}
-.nav-icon{width:18px;text-align:center;font-size:16px}
-.sidebar-footer{padding:16px 20px;border-top:1px solid var(--card-border)}
-.donate-btn{display:block;text-align:center;background:linear-gradient(135deg,#f59e0b,#ef4444);color:white;padding:10px;border-radius:8px;text-decoration:none;font-weight:600;font-size:13px;transition:opacity .2s}
-.donate-btn:hover{opacity:.85}
+  .container { width: 100%; max-width: 780px; display: flex; flex-direction: column; gap: 20px; }
 
-/* Main */
-.main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh}
-.topbar{height:64px;background:var(--bg2);border-bottom:1px solid var(--card-border);display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:50}
-.topbar-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700}
-.topbar-right{display:flex;align-items:center;gap:12px}
-.theme-toggle{background:var(--card);border:1px solid var(--card-border);color:var(--text);padding:8px 12px;border-radius:8px;cursor:pointer;font-size:16px}
-.status-dot{width:8px;height:8px;background:var(--accent3);border-radius:50%;animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+  /* Chat box */
+  .chat-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; }
+  .chat-top {
+    padding: 16px 22px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg3);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .avatar {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .chat-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; }
+  .chat-sub { font-size: 11px; color: var(--green); margin-top: 2px; }
 
-/* Content */
-.content{padding:28px;flex:1}
+  /* Messages */
+  #messages {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-height: 340px;
+    max-height: 540px;
+    overflow-y: auto;
+  }
+  #messages::-webkit-scrollbar { width: 4px; }
+  #messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-/* Cards */
-.card{background:var(--card);border:1px solid var(--card-border);border-radius:16px;padding:24px;backdrop-filter:blur(12px)}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  .msg { max-width: 88%; padding: 14px 18px; border-radius: 16px; font-size: 14px; line-height: 1.7; animation: up 0.25s ease; }
+  @keyframes up { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
 
-/* Other CSS remains the same, skipped for brevity */
+  .msg-user {
+    background: linear-gradient(135deg, var(--purple), #4f46e5);
+    color: #fff;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+  }
+  .msg-ai {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+    width: 100%;
+    max-width: 100%;
+  }
+  .msg-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .msg-error .msg-label { color: var(--red); }
+  .msg-body {
+    white-space: pre-wrap;
+    font-size: 14px;
+    line-height: 1.75;
+  }
+  .msg-body strong { color: #f1f5f9; }
+  .msg-body em { color: #a5b4fc; font-style: italic; }
+  .msg-body code {
+    background: rgba(0,229,255,0.1);
+    border: 1px solid rgba(0,229,255,0.2);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-family: monospace;
+  }
 
-/* Add JS to toggle theme & pages */
+  /* Loading dots */
+  .ldots span { animation: blink 1.2s infinite; opacity: 0.3; }
+  .ldots span:nth-child(2) { animation-delay: 0.2s; }
+  .ldots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes blink { 0%,100%{opacity:0.3} 50%{opacity:1} }
+
+  /* Chips */
+  .chips { padding: 0 22px 16px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+  }
+  .chip:hover { color: var(--accent); border-color: var(--accent); background: rgba(0,229,255,0.05); }
+
+  /* Input area */
+  .input-row {
+    padding: 14px 18px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+  }
+  #promptInput {
+    flex: 1;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    resize: none;
+    min-height: 46px;
+    max-height: 130px;
+    transition: border-color 0.2s;
+    line-height: 1.5;
+  }
+  #promptInput:focus { border-color: var(--accent); }
+  #promptInput::placeholder { color: var(--muted); }
+  #sendBtn {
+    background: linear-gradient(135deg, var(--accent), #0099bb);
+    color: #000;
+    border: none;
+    padding: 12px 22px;
+    border-radius: 12px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  #sendBtn:hover { filter: brightness(1.12); transform: translateY(-1px); }
+  #sendBtn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; filter: none; }
+
+  /* Info card */
+  .info-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px 24px;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+  .info-card h3 { font-family: 'Syne', sans-serif; font-size: 14px; color: var(--text); margin-bottom: 10px; }
+  .checks { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 10px; }
+  .checks span { font-size: 12px; }
+  .checks span::before { content: '✓ '; color: var(--green); font-weight: 700; }
+
+  footer { margin-top: 30px; text-align: center; font-size: 12px; color: var(--muted); }
+  footer a { color: var(--accent); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  @media(max-width:500px) { .logo { font-size: 24px; } }
 </style>
 </head>
 <body>
 
-<!-- Sidebar -->
-<aside class="sidebar" id="sidebar">
-  <div class="sidebar-logo">
-    <div class="logo-text">⚡ Fikrago AI</div>
-    <div class="logo-sub">SEO Pro Platform</div>
+<header>
+  <div class="logo">⚡ Fikrago AI SEO Pro</div>
+  <div class="tagline">Powered by Z.ai · Secured via Vercel</div>
+  <div class="status">
+    <span class="dot"></span>
+    AI Online — API key secured server-side
   </div>
-  <nav class="sidebar-nav">
-    <div class="nav-section">Main</div>
-    <div class="nav-item active" onclick="showPage('dashboard',this)"><span class="nav-icon">📊</span>Dashboard</div>
-    <div class="nav-item" onclick="showPage('keywords',this)"><span class="nav-icon">🔍</span>Keyword Research</div>
-    <div class="nav-item" onclick="showPage('competitor',this)"><span class="nav-icon">🏆</span>Competitor Analysis</div>
-    <div class="nav-item" onclick="showPage('serp',this)"><span class="nav-icon">📈</span>SERP Analyzer</div>
-    <div class="nav-item" onclick="showPage('internal',this)"><span class="nav-icon">🔗</span>Internal Links</div>
-    <div class="nav-section">AI Tools</div>
-    <div class="nav-item" onclick="showPage('chat',this)"><span class="nav-icon">🤖</span>AI Chat Mode</div>
-    <div class="nav-item" onclick="showPage('analytics',this)"><span class="nav-icon">📉</span>Analytics</div>
-    <div class="nav-section">More</div>
-    <div class="nav-item" onclick="showPage('products',this)"><span class="nav-icon">🛍️</span>Products</div>
-    <div class="nav-item" onclick="showPage('settings',this)"><span class="nav-icon">⚙️</span>Settings</div>
-    <div class="nav-item" onclick="showPage('about',this)"><span class="nav-icon">ℹ️</span>About</div>
-  </nav>
-  <div class="sidebar-footer">
-    <a href="https://paypal.me/websiteMA" target="_blank" class="donate-btn">❤️ Support Us</a>
-  </div>
-</aside>
+</header>
 
-<!-- Main -->
-<div class="main">
-  <header class="topbar">
-    <div style="display:flex;align-items:center;gap:12px">
-      <button class="menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
-      <div class="topbar-title" id="page-title">Dashboard</div>
-    </div>
-    <div class="topbar-right">
-      <span style="font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px">
-        <span class="status-dot"></span>AI Active
-      </span>
-      <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
-    </div>
-  </header>
+<div class="container">
 
-  <div class="content">
-    <h1 style="color:white;text-align:center;margin-top:50px;">Fikrago AI SEO Pro Loaded!</h1>
+  <div class="chat-box">
+    <div class="chat-top">
+      <div class="avatar">🤖</div>
+      <div>
+        <div class="chat-name">Fikrago AI Assistant</div>
+        <div class="chat-sub">● Connected via /api/proxy</div>
+      </div>
+    </div>
+
+    <div id="messages">
+      <div class="msg msg-ai">
+        <div class="msg-label">🤖 AI Assistant</div>
+        <div class="msg-body">Hello! I'm your Fikrago AI assistant. Ask me anything about SEO, keywords, content strategy, competitors, or any other topic — I'll answer you directly.</div>
+      </div>
+    </div>
+
+    <div class="chips">
+      <div class="chip" onclick="useChip(this)">🔍 Low competition keywords for blogging</div>
+      <div class="chip" onclick="useChip(this)">📈 How to rank on Google faster</div>
+      <div class="chip" onclick="useChip(this)">🏆 How to do competitor analysis</div>
+      <div class="chip" onclick="useChip(this)">📝 Content cluster strategy ideas</div>
+      <div class="chip" onclick="useChip(this)">🔗 Internal linking best practices</div>
+    </div>
+
+    <div class="input-row">
+      <textarea id="promptInput" placeholder="Type your question and press Enter..." rows="1"></textarea>
+      <button id="sendBtn" onclick="sendMessage()">Send ↑</button>
+    </div>
   </div>
+
+  <div class="info-card">
+    <h3>🔒 How the AI works on this tool</h3>
+    Your browser sends your question to <code>/api/proxy</code> on Vercel.
+    The server adds the Z.ai API key and gets the answer — the key is never in the HTML or visible to anyone.
+    <div class="checks">
+      <span>No API key in frontend</span>
+      <span>Vercel serverless proxy</span>
+      <span>Full conversation memory</span>
+      <span>Answers any question directly</span>
+      <span>Error handling built-in</span>
+      <span>Works after GitHub → Vercel deploy</span>
+    </div>
+  </div>
+
 </div>
 
-<script>
-function toggleTheme() {
-  document.documentElement.dataset.theme =
-    document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-}
+<footer>
+  <a href="https://www.fikrago.com/" target="_blank">fikrago.com</a>
+  &nbsp;·&nbsp;
+  <a href="https://paypal.me/websiteMA" target="_blank">❤️ Support Us</a>
+  &nbsp;·&nbsp;
+  <a href="https://www.fikrago.com/p/products.html" target="_blank">🛍️ Products</a>
+</footer>
 
-// Simple page switching (for demo, add full logic later)
-function showPage(pageId, el) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-' + pageId)?.classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  if (el) el.classList.add('active');
-  document.getElementById('page-title').innerText = el?.innerText || 'Dashboard';
-}
+<script>
+  var history = [];
+  var busy = false;
+
+  // Auto-grow textarea
+  var ta = document.getElementById('promptInput');
+  ta.addEventListener('input', function () {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 130) + 'px';
+  });
+
+  // Enter = send, Shift+Enter = new line
+  ta.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+
+  function useChip(el) {
+    ta.value = el.textContent.replace(/^\S+\s/, '').trim();
+    ta.focus();
+  }
+
+  function sendMessage() {
+    if (busy) return;
+    var prompt = ta.value.trim();
+    if (!prompt) return;
+
+    var box = document.getElementById('messages');
+
+    // User bubble
+    addBubble(box, 'user', null, prompt);
+    ta.value = '';
+    ta.style.height = 'auto';
+    box.scrollTop = box.scrollHeight;
+
+    // Save to history
+    history.push({ role: 'user', content: prompt });
+
+    // Disable input
+    busy = true;
+    document.getElementById('sendBtn').disabled = true;
+
+    // Loading bubble
+    var loader = document.createElement('div');
+    loader.className = 'msg msg-ai';
+    loader.id = 'loader';
+    loader.innerHTML = '<div class="msg-label">🤖 AI Assistant</div>'
+      + '<div class="msg-body"><span class="ldots">Loading<span>.</span><span>.</span><span>.</span></span></div>';
+    box.appendChild(loader);
+    box.scrollTop = box.scrollHeight;
+
+    // ── POST to /api/proxy — no API key here ──────────────────
+    fetch('/api/proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt: prompt, messages: history })
+    })
+    .then(function (r) {
+      if (!r.ok) throw new Error('Server error ' + r.status + ' — ' + r.statusText);
+      return r.json();
+    })
+    .then(function (data) {
+      removeLoader();
+
+      // Support { reply }, { choices }, { content } response shapes
+      var reply =
+        (data.reply) ||
+        (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) ||
+        (data.content && data.content[0] && data.content[0].text) ||
+        null;
+
+      if (!reply) {
+        if (data.error) {
+          showError(box, 'API error: ' + (data.error.message || JSON.stringify(data.error)));
+        } else {
+          showError(box, 'Unexpected response:\n' + JSON.stringify(data, null, 2));
+        }
+        history.pop();
+        return;
+      }
+
+      history.push({ role: 'assistant', content: reply });
+      addBubble(box, 'ai', '🤖 AI Assistant', reply);
+    })
+    .catch(function (err) {
+      removeLoader();
+      history.pop();
+      showError(box,
+        'Could not reach /api/proxy\n\n'
+        + err.message + '\n\n'
+        + 'Check:\n'
+        + '• Vercel app is deployed\n'
+        + '• api/proxy.js exists in your GitHub repo\n'
+        + '• ZAI_API_KEY is set in Vercel Environment Variables'
+      );
+    });
+  }
+
+  function removeLoader() {
+    busy = false;
+    document.getElementById('sendBtn').disabled = false;
+    var l = document.getElementById('loader');
+    if (l) l.remove();
+  }
+
+  function addBubble(box, type, label, text) {
+    var div = document.createElement('div');
+    if (type === 'user') {
+      div.className = 'msg msg-user';
+      div.textContent = text;
+    } else {
+      div.className = 'msg msg-ai';
+      div.innerHTML = '<div class="msg-label">' + esc(label) + '</div>'
+        + '<div class="msg-body">' + fmt(text) + '</div>';
+    }
+    box.appendChild(div);
+    box.scrollTop = box.scrollHeight;
+  }
+
+  function showError(box, text) {
+    var div = document.createElement('div');
+    div.className = 'msg msg-ai msg-error';
+    div.innerHTML = '<div class="msg-label">⚠️ Error</div>'
+      + '<div class="msg-body" style="color:#fca5a5">' + esc(text) + '</div>';
+    box.appendChild(div);
+    box.scrollTop = box.scrollHeight;
+  }
+
+  function fmt(text) {
+    return esc(text)
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      .replace(/`(.+?)`/g, '<code>$1</code>');
+  }
+
+  function esc(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
 </script>
 </body>
 </html>
